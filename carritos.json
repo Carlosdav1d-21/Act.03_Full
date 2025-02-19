@@ -1,0 +1,31 @@
+[
+  {
+    "username": "miusuario",
+    "productos": [
+      {
+        "id": 1,
+        "nombre": "Taco",
+        "precio": 15,
+        "cantidad": 1
+      },
+      {
+        "id": 2,
+        "nombre": "Campechana",
+        "precio": 20,
+        "cantidad": 1
+      },
+      {
+        "id": 4,
+        "nombre": "Hamburguesa",
+        "precio": 50,
+        "cantidad": 2
+      },
+      {
+        "id": 5,
+        "nombre": "Agua",
+        "precio": 10,
+        "cantidad": 4
+      }
+    ]
+  }
+]
