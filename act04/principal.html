@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .productos, .carrito {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .producto, .item-carrito {
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+            width: 150px;
+        }
+        button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Carrito de Compras</h1>
+    <div id="productos" class="productos"></div>
+
+    <h2>Carrito</h2>
+    <div id="carrito" class="carrito"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            cargarProductos();
+            cargarCarrito();
+        });
+
+        function cargarProductos() {
+            fetch("/productos")
+                .then(response => response.json())
+                .then(productos => {
+                    const contenedor = document.getElementById("productos");
+                    contenedor.innerHTML = "";
+                    productos.forEach(producto => {
+                        const div = document.createElement("div");
+                        div.classList.add("producto");
+                        div.innerHTML = `
+                            <p>${producto.nombre} - $${producto.precio}</p>
+                            <button onclick="agregarAlCarrito(${producto.id})">Agregar</button>
+                        `;
+                        contenedor.appendChild(div);
+                    });
+                });
+        }
+
+        function cargarCarrito() {
+            fetch("/carrito", {
+                headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+            })
+                .then(response => response.json())
+                .then(carrito => {
+                    const contenedor = document.getElementById("carrito");
+                    contenedor.innerHTML = "";
+                    carrito.forEach(producto => {
+                        const div = document.createElement("div");
+                        div.classList.add("item-carrito");
+                        div.innerHTML = `
+                            <p>${producto.nombre} - $${producto.precio} x ${producto.cantidad}</p>
+                            <button onclick="modificarCantidad(${producto.id}, ${producto.cantidad + 1})">+</button>
+                            <button onclick="modificarCantidad(${producto.id}, ${producto.cantidad - 1})">-</button>
+                            <button onclick="eliminarDelCarrito(${producto.id})">Eliminar</button>
+                        `;
+                        contenedor.appendChild(div);
+                    });
+                });
+        }
+
+        function agregarAlCarrito(id) {
+            fetch("/carrito", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({ id })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Error al agregar al carrito");
+                return response.json();
+            })
+            .then(() => cargarCarrito())
+            .catch(error => console.error(error));
+        }
+
+        function modificarCantidad(id, cantidad) {
+            if (cantidad <= 0) {
+                eliminarDelCarrito(id);
+                return;
+            }
+            fetch(`/carrito/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({ cantidad })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Error al modificar la cantidad");
+                return response.json();
+            })
+            .then(() => cargarCarrito())
+            .catch(error => console.error(error));
+        }
+
+        function eliminarDelCarrito(id) {
+            fetch(`/carrito/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Error al eliminar del carrito");
+                return response.json();
+            })
+            .then(() => cargarCarrito())
+            .catch(error => console.error(error));
+        }
+    </script>
+</body>
+</html>

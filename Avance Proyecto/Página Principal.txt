@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Concesionaria - Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Concesionaria</h1>
+  </header>
+  <main>
+    <section id="carList">
+      <!-- Aquí se mostrará la lista de vehículos -->
+    </section>
+    <section class="form-section">
+      <h3>Agregar Nuevo Vehículo</h3>
+      <form id="addCarForm">
+        <input type="text" id="brand" placeholder="Marca" required>
+        <input type="text" id="model" placeholder="Modelo" required>
+        <input type="number" id="year" placeholder="Año" required>
+        <input type="number" id="price" placeholder="Precio" required>
+        <button type="submit">Agregar</button>
+      </form>
+    </section>
+  </main>
+  <script src="dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+// Función para cargar la lista de vehículos
+async function loadCars() {
+  try {
+    const response = await fetch('http://localhost:3000/api/cars');
+    const cars = await response.json();
+    const carList = document.getElementById('carList');
+    carList.innerHTML = '';
+
+    cars.forEach(car => {
+      const carItem = document.createElement('div');
+      carItem.className = 'car-item';
+      carItem.innerHTML = `
+        <strong>${car.brand} ${car.model}</strong> (${car.year}) - $${car.price}
+        <button data-id="${car._id}" class="delete-btn">Eliminar</button>
+      `;
+      carList.appendChild(carItem);
+    });
+  } catch (error) {
+    console.error('Error al cargar vehículos:', error);
+  }
+}
+
+// Agregar nuevo vehículo
+document.getElementById('addCarForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+  const newCar = {
+    brand: document.getElementById('brand').value,
+    model: document.getElementById('model').value,
+    year: document.getElementById('year').value,
+    price: document.getElementById('price').value
+  };
+
+  try {
+    const response = await fetch('http://localhost:3000/api/cars', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(newCar)
+    });
+    if (response.ok) {
+      loadCars();
+      e.target.reset();
+    } else {
+      alert('Error al agregar vehículo');
+    }
+  } catch (error) {
+    console.error('Error agregando vehículo:', error);
+  }
+});
+
+// Eliminar vehículo (delegación de eventos)
+document.getElementById('carList').addEventListener('click', async (e) => {
+  if (e.target.classList.contains('delete-btn')) {
+    const token = localStorage.getItem('token');
+    const carId = e.target.getAttribute('data-id');
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/cars/${carId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        loadCars();
+      } else {
+        alert('Error al eliminar vehículo');
+      }
+    } catch (error) {
+      console.error('Error eliminando vehículo:', error);
+    }
+  }
+});
+
+// Cargar vehículos al iniciar el dashboard
+loadCars();

@@ -1,0 +1,27 @@
+function errorHandler(err, req, res, next) {
+  console.error(err); // Registro del error en consola
+  const status = err.status || 500;
+  res.status(status).json({
+    error: err.message || 'Error interno del servidor'
+  });
+}
+
+module.exports = errorHandler;
+
+
+
+
+Middleware en el archivo principal (server.js) al final de todas las rutas:
+
+
+const errorHandler = require('./middlewares/errorHandler');
+
+// Rutas
+const authRoutes = require('./routes/auth');
+const carRoutes = require('./routes/cars');
+
+app.use('/api/auth', authRoutes);
+app.use('/api/cars', carRoutes);
+
+// Middleware para manejo de errores
+app.use(errorHandler);

@@ -1,0 +1,28 @@
+PORT=3000
+DB_URI=mongodb://localhost:27017/concesionaria
+JWT_SECRET=clave_super_secreta
+
+
+Código:
+
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+const app = express();
+
+// Configuración de middlewares
+app.use(express.json());
+app.use(cors());
+
+// Conexión a la base de datos
+mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Conectado a MongoDB'))
+  .catch((error) => console.error('Error conectando a MongoDB:', error));
+
+// Definición de rutas y middlewares (se explican a continuación)
+
+app.listen(process.env.PORT, () => {
+  console.log(`Servidor iniciado en el puerto ${process.env.PORT}`);
+});
